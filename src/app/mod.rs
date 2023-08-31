@@ -44,8 +44,12 @@ impl App {
                 break 'running;
             }
 
+            for _ in 0..10 {
+                let world_read = self.world.clone();
+                self.update(&world_read);
+            }
+            
             let world_read = self.world.clone();
-            self.update(&world_read);
             App::render(&world_read, &mut sdl);
 
             sdl.canvas.present();

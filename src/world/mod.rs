@@ -27,7 +27,7 @@ impl World {
                 *seg = Segment::Block(Block::default());
             }
         });
-        grid[get_index(128, 32, SIZE_WORLD[0])] = Segment::Cell(Cell {
+        grid[get_index(128, 30, SIZE_WORLD[0])] = Segment::Cell(Cell {
             id_family: 0,
             light_absorption_coefficient: 0.5,
             light: 1.0,
