@@ -31,6 +31,7 @@ impl World {
             energy: 100.0,
             is_seed: true,
             lifetime: 0,
+            color: (0x54, 0x92, 0x48),
             next: -1,
             genome: Genome::default(),
         });

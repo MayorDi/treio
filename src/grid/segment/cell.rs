@@ -1,7 +1,8 @@
+use rand::Rng;
 use sdl2::rect::Rect;
 
 use crate::{
-    constants::{SIZE_RECT_RENDER, SIZE_WORLD},
+    constants::{SIZE_RECT_RENDER, SIZE_WORLD, AMOUT_GENES},
     traits::{Behaviour, Render},
     world::{get_neighbors_idxs, get_pos, World},
 };
@@ -20,6 +21,7 @@ pub struct Cell {
     pub is_seed: bool,
     pub lifetime: usize,
     pub next: i8,
+    pub color: (u8, u8, u8),
     pub genome: Genome,
 }
 
@@ -31,7 +33,24 @@ impl Cell {
             is_seed: false,
             lifetime: 0,
             next: 0,
+            color: (0x54, 0x92, 0x48),
             genome: Default::default(),
+        }
+    }
+
+    pub fn mutate(&mut self) {
+        if rand::thread_rng().gen_range(0.0..1.0) < 0.05 {
+            self.color = (
+                rand::thread_rng().gen_range(0..255),
+                rand::thread_rng().gen_range(0..255),
+                rand::thread_rng().gen_range(0..255),
+            );
+
+            for gene in self.genome.genes.iter_mut() {
+                for nucl in gene.iter_mut() {
+                    *nucl = rand::thread_rng().gen_range(-1..(AMOUT_GENES as i8));
+                }
+            }
         }
     }
 }
@@ -51,7 +70,7 @@ impl Render for Cell {
         canvas.set_draw_color(if self.is_seed {
             (0xed, 0xf2, 0xa8)
         } else {
-            (0x54, 0x92, 0x48)
+            self.color
         });
         canvas.fill_rect(rect).unwrap();
     }
@@ -78,7 +97,7 @@ impl Behaviour for Cell {
             } else if let Segment::Block(_) = world_read.grid[neighbors[BOTTOM]] {
                 cell.next = 0;
                 cell.lifetime = 0;
-                cell.genome.mutate();
+                cell.mutate();
                 world.grid[idx].to_cell().unwrap().is_seed = false;
             }
         } else {
