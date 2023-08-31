@@ -9,5 +9,5 @@ pub trait Render {
 
 /// Sets behavioral features.
 pub trait Behaviour {
-    fn update(world_read: &World, world: &mut World, idx: usize);
+    fn update(world_read: &World, world: &mut World, idx_segment: usize);
 }

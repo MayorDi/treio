@@ -2,7 +2,7 @@ use rand::Rng;
 use sdl2::rect::Rect;
 
 use crate::{
-    constants::{SIZE_RECT_RENDER, SIZE_WORLD, AMOUT_GENES},
+    constants::{AMOUT_GENES, SIZE_RECT_RENDER, SIZE_WORLD},
     traits::{Behaviour, Render},
     world::{get_neighbors_idxs, get_pos, World},
 };
@@ -53,6 +53,10 @@ impl Cell {
             }
         }
     }
+
+    pub fn generate_energy(&mut self, light: f32) {
+        self.energy += light / 10.0;
+    }
 }
 
 impl Render for Cell {
@@ -77,31 +81,33 @@ impl Render for Cell {
 }
 
 impl Behaviour for Cell {
-    fn update(world_read: &World, world: &mut World, idx: usize) {
-        let neighbors = get_neighbors_idxs(idx);
-        let cell = world.grid[idx].to_cell().unwrap();
-        cell.lifetime += 1;
+    fn update(world_read: &World, world: &mut World, idx_segment: usize) {
+        let neighbors = get_neighbors_idxs(idx_segment);
+        let cell = world.grid[idx_segment].to_cell().unwrap();
 
-        if cell.lifetime > 50 && cell.next != -1 {
-            world.grid[idx] = Segment::Air;
+        cell.lifetime += 1;
+        cell.generate_energy(50.0);
+
+        if cell.lifetime > 100 && cell.next != -1 {
+            world.grid[idx_segment] = Segment::Air;
             return;
-        } else if cell.lifetime > 100 && cell.next == -1 {
-            world.grid[idx] = Segment::Air;
+        } else if cell.lifetime > 150 && cell.next == -1 {
+            world.grid[idx_segment] = Segment::Air;
             return;
         }
 
         if cell.is_seed {
             if let Segment::Air = world_read.grid[neighbors[BOTTOM]] {
                 world.grid[neighbors[BOTTOM]] = Segment::Cell(cell.clone());
-                world.grid[idx] = Segment::Air;
+                world.grid[idx_segment] = Segment::Air;
             } else if let Segment::Block(_) = world_read.grid[neighbors[BOTTOM]] {
                 cell.next = 0;
                 cell.lifetime = 0;
                 cell.mutate();
-                world.grid[idx].to_cell().unwrap().is_seed = false;
+                world.grid[idx_segment].to_cell().unwrap().is_seed = false;
             }
         } else {
-            if !cell.is_seed {
+            if !cell.is_seed && cell.energy >= 100.0 {
                 let mut i = 1;
                 let mut children: Vec<Cell> = neighbors
                     .iter()
@@ -118,11 +124,22 @@ impl Behaviour for Cell {
                     .collect();
 
                 for (idx, child) in children.iter_mut().enumerate() {
+                    let cell = world.grid[idx_segment].to_cell().unwrap();
+
                     if child.next != 0 {
                         if let Segment::Air = world_read.grid[neighbors[idx]] {
+                            child.energy = 0.0;
+
                             if child.next == -1 {
+                                child.energy = 100.0;
+                                cell.energy -= 100.0;
+
                                 child.is_seed = true;
+                            } else {
+                                child.energy = 25.0;
+                                cell.energy -= 25.0;
                             }
+
                             world.grid[neighbors[idx]] = Segment::Cell(child.clone());
                         }
                     }
