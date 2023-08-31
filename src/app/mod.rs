@@ -48,7 +48,7 @@ impl App {
                 let world_read = self.world.clone();
                 self.update(&world_read);
             }
-            
+
             let world_read = self.world.clone();
             App::render(&world_read, &mut sdl);
 

@@ -1,20 +1,20 @@
 [package]
-name = "treio"
-description = "Treio is a small tree evolution simulation program."
-version = "0.0.1"
-edition = "2021"
-authors = ["Dmitriy Mayorov <MayorDi@yandex.ru>"]
-homepage = "https://github.com/MayorDi/treio"
-repository = "https://github.com/MayorDi/treio"
-readme = "./README.md"
-license = "Apache-2.0"
+name            = "treio"
+description     = "Treio is a small tree evolution simulation program."
+version         = "0.1.0"
+edition         = "2021"
+authors         = ["Dmitriy Mayorov <MayorDi@yandex.ru>"]
+homepage        = "https://github.com/MayorDi/treio"
+repository      = "https://github.com/MayorDi/treio"
+readme          = "./README.md"
+license         = "Apache-2.0"
 include         = ["src/**/*.*", "README.md", "LICENSE-APACHE"]
 keywords        = ["evolution", "trees"]
 rust-version    = "1.68"
 
 [dependencies]
-log = "0.4.20"
-env_logger = "0.10.0"
-rand =  "0.8.5"
-nalgebra = "0.32.3"
-sdl2 =  "0.35.2"
+log             = "0.4.20"
+env_logger      = "0.10.0"
+rand            =  "0.8.5"
+nalgebra        = "0.32.3"
+sdl2            =  "0.35.2"

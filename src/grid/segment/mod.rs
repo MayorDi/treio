@@ -1,10 +1,10 @@
-mod block;
 mod air;
+mod block;
 mod cell;
 mod genome;
 
-pub use block::*;
 pub use air::*;
+pub use block::*;
 pub use cell::*;
 pub use genome::*;
 
