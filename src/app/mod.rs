@@ -88,7 +88,7 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            title: String::from("Dryad"),
+            title: String::from("Treio"),
             size: (1200, 600),
         }
     }
