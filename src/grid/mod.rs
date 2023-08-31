@@ -12,7 +12,7 @@ pub struct Grid {
 impl Grid {
     pub fn new(size: usize) -> Self {
         Grid {
-            segments: vec![Segment::default(); size],
+            segments: vec![Segment::Air(Air::default()); size],
         }
     }
 }

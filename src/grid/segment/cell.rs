@@ -2,21 +2,18 @@ use rand::Rng;
 use sdl2::rect::Rect;
 
 use crate::{
-    constants::{AMOUT_GENES, SIZE_RECT_RENDER, SIZE_WORLD},
+    constants::{AMOUT_GENES, SIZE_RECT_RENDER, SIZE_WORLD, BOTTOM, TOP},
     traits::{Behaviour, Render},
     world::{get_neighbors_idxs, get_pos, World},
 };
 
-use super::{Genome, Segment};
-
-const LEFT: usize = 0;
-const RIGHT: usize = 1;
-const TOP: usize = 2;
-const BOTTOM: usize = 3;
+use super::{Genome, Segment, Air};
 
 /// `Cell` is the main, executive essence of the simulation.
 #[derive(Debug, Clone, Default)]
 pub struct Cell {
+    pub light_absorption_coefficient: f32,
+    pub light: f32,
     pub energy: f32,
     pub is_seed: bool,
     pub lifetime: usize,
@@ -29,6 +26,8 @@ impl Cell {
     /// Creates a new cell with a given amount of energy.
     pub fn new(energy: f32) -> Self {
         Self {
+            light_absorption_coefficient: 0.5,
+            light: 1.0,
             energy,
             is_seed: false,
             lifetime: 0,
@@ -55,7 +54,7 @@ impl Cell {
     }
 
     pub fn generate_energy(&mut self, light: f32) {
-        self.energy += light / 10.0;
+        self.energy += light * 5.0;
     }
 }
 
@@ -82,24 +81,30 @@ impl Render for Cell {
 
 impl Behaviour for Cell {
     fn update(world_read: &World, world: &mut World, idx_segment: usize) {
-        let neighbors = get_neighbors_idxs(idx_segment);
         let cell = world.grid[idx_segment].to_cell().unwrap();
+        let neighbors = get_neighbors_idxs(idx_segment);
+
+        if let Segment::Air(air) = &world_read.grid[neighbors[TOP]] {
+            cell.light = air.light * cell.light_absorption_coefficient;
+        }else if let Segment::Cell(n_cell) = &world_read.grid[neighbors[TOP]] {
+            cell.light = n_cell.light * cell.light_absorption_coefficient;
+        }
 
         cell.lifetime += 1;
-        cell.generate_energy(50.0);
+        cell.generate_energy(cell.light);
 
         if cell.lifetime > 100 && cell.next != -1 {
-            world.grid[idx_segment] = Segment::Air;
+            world.grid[idx_segment] = Segment::Air(Air::default());
             return;
         } else if cell.lifetime > 150 && cell.next == -1 {
-            world.grid[idx_segment] = Segment::Air;
+            world.grid[idx_segment] = Segment::Air(Air::default());
             return;
         }
 
         if cell.is_seed {
-            if let Segment::Air = world_read.grid[neighbors[BOTTOM]] {
+            if let Segment::Air(_) = world_read.grid[neighbors[BOTTOM]] {
                 world.grid[neighbors[BOTTOM]] = Segment::Cell(cell.clone());
-                world.grid[idx_segment] = Segment::Air;
+                world.grid[idx_segment] = Segment::Air(Air::default());
             } else if let Segment::Block(_) = world_read.grid[neighbors[BOTTOM]] {
                 cell.next = 0;
                 cell.lifetime = 0;
@@ -127,7 +132,7 @@ impl Behaviour for Cell {
                     let cell = world.grid[idx_segment].to_cell().unwrap();
 
                     if child.next != 0 {
-                        if let Segment::Air = world_read.grid[neighbors[idx]] {
+                        if let Segment::Air(_) = world_read.grid[neighbors[idx]] {
                             child.energy = 0.0;
 
                             if child.next == -1 {

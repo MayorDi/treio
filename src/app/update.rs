@@ -14,7 +14,9 @@ impl App {
                     Cell::update(world_read, &mut self.world, i);
                 }
 
-                _ => {}
+                Segment::Air(_) => {
+                    Air::update(world_read, &mut self.world, i);
+                }
             }
         }
     }

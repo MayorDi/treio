@@ -1,7 +1,3 @@
-use rand::Rng;
-
-use crate::constants::AMOUT_GENES;
-
 /// `Genome` - contains all the necessary genes for the operation of the cell reproduction apparatus.
 ///
 /// ## Feature:
