@@ -43,3 +43,28 @@ pub const fn get_index(x: usize, y: usize, width: usize) -> usize {
 pub const fn get_pos(index: usize, width: usize) -> Vector2<usize> {
     Vector2::new(index % width, index / width)
 }
+
+/// Get all neighboring segment segments.
+pub fn get_neighbors_idxs(idx_segment: usize) -> [usize; 4] {
+    let pos = get_pos(idx_segment, SIZE_WORLD[0]);
+    let (w_max, h_max) = (SIZE_WORLD[0] as i32, SIZE_WORLD[1] as i32);
+    let (x, y) = (pos.x as i32, pos.y as i32);
+    let neighbors = [
+        get_index(limit(w_max, x - 1) as usize, y as usize, SIZE_WORLD[0]),
+        get_index(limit(w_max, x + 1) as usize, y as usize, SIZE_WORLD[0]),
+        get_index(x as usize, limit(h_max, y + 1) as usize, SIZE_WORLD[0]),
+        get_index(x as usize, limit(h_max, y - 1) as usize, SIZE_WORLD[0]),
+    ];
+
+    neighbors
+}
+
+fn limit(max: i32, n: i32) -> i32 {
+    if n < 0 {
+        return 0;
+    } else if n > max {
+        return max;
+    }
+
+    n
+}

@@ -14,7 +14,7 @@ impl SDL {
         let window = video_subsystem
             .window(settings.title.as_str(), settings.size.0, settings.size.1)
             .position_centered()
-            .resizable()
+            .fullscreen_desktop()
             .opengl()
             .build()
             .map_err(|e| e.to_string())

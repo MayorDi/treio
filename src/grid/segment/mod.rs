@@ -13,3 +13,13 @@ pub enum Segment {
     Cell(Cell),
     Block(Block),
 }
+
+impl Segment {
+    pub fn to_cell(&mut self) -> Option<&mut Cell> {
+        if let Segment::Cell(cell) = self {
+            return Some(cell);
+        }
+
+        None
+    }
+}

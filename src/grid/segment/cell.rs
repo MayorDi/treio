@@ -1,11 +1,17 @@
 use sdl2::rect::Rect;
 
 use crate::{
+    constants::{SIZE_RECT_RENDER, SIZE_WORLD},
     traits::{Behaviour, Render},
-    world::{World, get_pos}, constants::{SIZE_WORLD, SIZE_RECT_RENDER},
+    world::{get_neighbors_idxs, get_pos, World},
 };
 
-use super::Genome;
+use super::{Genome, Segment};
+
+const LEFT: usize = 0;
+const RIGHT: usize = 1;
+const TOP: usize = 2;
+const BOTTOM: usize = 3;
 
 /// `Cell` is the main, executive essence of the simulation.
 #[derive(Debug, Clone, Default)]
@@ -33,7 +39,7 @@ impl Render for Cell {
         let canvas = &mut sdl.canvas;
         let rect = Rect::new(
             x * SIZE_RECT_RENDER,
-            SIZE_RECT_RENDER * (-y + 2*(SIZE_WORLD[1] as i32) - 1),
+            SIZE_RECT_RENDER * (-y + 2 * (SIZE_WORLD[1] as i32) - 1),
             SIZE_RECT_RENDER as u32,
             SIZE_RECT_RENDER as u32,
         );
@@ -48,5 +54,18 @@ impl Render for Cell {
 }
 
 impl Behaviour for Cell {
-    fn update(world_read: &World, world: &mut World, idx: usize) {}
+    fn update(world_read: &World, world: &mut World, idx: usize) {
+        let neighbores = get_neighbors_idxs(idx);
+        let cell = world.grid[idx].to_cell().unwrap();
+        if cell.is_seed {
+            if let Segment::Air = world_read.grid[neighbores[BOTTOM]] {
+                world.grid[neighbores[BOTTOM]] = Segment::Cell(cell.clone());
+                world.grid[idx] = Segment::Air;
+            } else {
+                world.grid[idx].to_cell().unwrap().is_seed = false;
+            }
+        }
+
+        
+    }
 }

@@ -27,5 +27,5 @@ impl Render for Block {
 }
 
 impl Behaviour for Block {
-    fn update(world_read: &World, world: &mut World, idx: usize) {}
+    fn update(_world_read: &World, _world: &mut World, _idx: usize) {}
 }
