@@ -78,6 +78,7 @@ impl Behaviour for Cell {
             } else if let Segment::Block(_) = world_read.grid[neighbors[BOTTOM]] {
                 cell.next = 0;
                 cell.lifetime = 0;
+                cell.genome.mutate();
                 world.grid[idx].to_cell().unwrap().is_seed = false;
             }
         } else {
