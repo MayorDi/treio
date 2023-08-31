@@ -30,6 +30,7 @@ impl World {
         grid[get_index(128, 32, SIZE_WORLD[0])] = Segment::Cell(Cell {
             energy: 100.0,
             is_seed: true,
+            lifetime: 0,
             next: -1,
             genome: Genome::default(),
         });
