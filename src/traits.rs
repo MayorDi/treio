@@ -4,7 +4,7 @@ use crate::{app::SDL, world::World};
 
 /// Allows you to conduct a common render.
 pub trait Render {
-    fn render(&self, sdl: &mut SDL);
+    fn render(&self, sdl: &mut SDL, idx: usize);
 }
 
 /// Sets behavioral features.
