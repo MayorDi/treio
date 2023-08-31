@@ -18,6 +18,7 @@ const BOTTOM: usize = 3;
 pub struct Cell {
     pub energy: f32,
     pub is_seed: bool,
+    pub next: i8,
     pub genome: Genome,
 }
 
@@ -27,6 +28,7 @@ impl Cell {
         Self {
             energy,
             is_seed: false,
+            next: 0,
             genome: Default::default(),
         }
     }
@@ -55,17 +57,44 @@ impl Render for Cell {
 
 impl Behaviour for Cell {
     fn update(world_read: &World, world: &mut World, idx: usize) {
-        let neighbores = get_neighbors_idxs(idx);
+        let neighbors = get_neighbors_idxs(idx);
         let cell = world.grid[idx].to_cell().unwrap();
         if cell.is_seed {
-            if let Segment::Air = world_read.grid[neighbores[BOTTOM]] {
-                world.grid[neighbores[BOTTOM]] = Segment::Cell(cell.clone());
+            if let Segment::Air = world_read.grid[neighbors[BOTTOM]] {
+                world.grid[neighbors[BOTTOM]] = Segment::Cell(cell.clone());
                 world.grid[idx] = Segment::Air;
-            } else {
+            } else if let Segment::Block(_) = world_read.grid[neighbors[BOTTOM]] {
+                cell.next = 0;
                 world.grid[idx].to_cell().unwrap().is_seed = false;
             }
-        }
+        } else {
+            if !cell.is_seed {
+                let mut i = 1;
+                let mut children: Vec<Cell> = neighbors
+                    .iter()
+                    .filter(|_| cell.next != -1)
+                    .map(|_| {
+                        let res = Cell {
+                            next: cell.genome.genes[cell.next as usize][i],
+                            ..cell.clone()
+                        };
+                        i += 1;
 
-        
+                        res
+                    })
+                    .collect();
+
+                for (idx, child) in children.iter_mut().enumerate() {
+                    if child.next != 0 {
+                        if let Segment::Air = world_read.grid[neighbors[idx]] {
+                            if child.next == -1 {
+                                child.is_seed = true;
+                            }
+                            world.grid[neighbors[idx]] = Segment::Cell(child.clone());
+                        }
+                    }
+                }
+            }
+        }
     }
 }

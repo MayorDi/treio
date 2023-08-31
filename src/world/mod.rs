@@ -1,6 +1,9 @@
 use nalgebra::Vector2;
 
-use crate::{grid::{Grid, Segment, Cell, Genome, Block}, constants::SIZE_WORLD};
+use crate::{
+    constants::SIZE_WORLD,
+    grid::{Block, Cell, Genome, Grid, Segment},
+};
 
 #[derive(Debug, Clone)]
 pub struct World {
@@ -27,10 +30,18 @@ impl World {
         grid[get_index(128, 32, SIZE_WORLD[0])] = Segment::Cell(Cell {
             energy: 100.0,
             is_seed: true,
-            genome: Genome::default()
+            next: -1,
+            genome: Genome::default(),
         });
 
         self.grid = grid;
+    }
+
+    pub fn get_segments_at(&self, idxs: Vec<usize>) -> Vec<(usize, Segment)> {
+        idxs.iter()
+            .filter(|i| **i < SIZE_WORLD[0] * SIZE_WORLD[1])
+            .map(|i| (*i, self.grid[*i].clone()))
+            .collect()
     }
 }
 
