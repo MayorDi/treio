@@ -28,6 +28,7 @@ impl World {
             }
         });
         grid[get_index(128, 32, SIZE_WORLD[0])] = Segment::Cell(Cell {
+            id_family: 0,
             light_absorption_coefficient: 0.5,
             light: 1.0,
             energy: 100.0,
@@ -62,7 +63,7 @@ pub const fn get_pos(index: usize, width: usize) -> Vector2<usize> {
 /// Get all neighboring segment segments.
 pub fn get_neighbors_idxs(idx_segment: usize) -> [usize; 4] {
     let pos = get_pos(idx_segment, SIZE_WORLD[0]);
-    let (w_max, h_max) = (SIZE_WORLD[0] as i32, SIZE_WORLD[1] as i32 - 1);
+    let (w_max, h_max) = (SIZE_WORLD[0] as i32 - 1, SIZE_WORLD[1] as i32 - 1);
     let (x, y) = (pos.x as i32, pos.y as i32);
     let neighbors = [
         get_index(limit(w_max, x - 1) as usize, y as usize, SIZE_WORLD[0]),
